@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hyper-Real Corporate Prompt Engine v3.0.12</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233b82f6'><path d='M12 2l2.4 5.4L20 9.8l-4.2 4.1 1 5.9-4.8-2.7-4.8 2.7 1-5.9-4.2-4.1 5.6-2.4L12 2z'/></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(71, 85, 105, 1); }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col custom-scrollbar transition-colors duration-200">
+
+    <header class="border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur sticky top-0 z-40 transition-colors duration-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    <i class="fa-solid me-0 fa-wand-magic-sparkles text-white text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-slate-900 dark:text-white leading-none">Hyper-Real Prompt Engine</h1>
+                    <span class="text-xs text-blue-600 dark:text-blue-400 font-mono">v3.0.12 • AI Client-Side LLM Engine</span>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <!-- User Profile Badge & Logout -->
+                <div id="userProfileBadge" class="hidden items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                    <i class="fa-solid fa-user-circle text-blue-500"></i>
+                    <span id="currentUserDisplay">Usuario</span>
+                    <button onclick="logoutUser()" title="Cerrar sesión" class="ml-1 text-slate-400 hover:text-rose-500 transition">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+
+                <!-- Global Reset Button -->
+                <button id="resetAllBtn" onclick="resetAllParameters()" title="Restablecer todos los parámetros" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition">
+                    <i class="fa-solid fa-rotate-left text-amber-500"></i>
+                    <span class="hidden sm:inline">Restablecer</span>
+                </button>
+
+                <!-- Light / Dark Mode Toggle Button -->
+                <button id="themeToggleBtn" onclick="toggleTheme()" title="Cambiar tema" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition">
+                    <i id="themeToggleIcon" class="fa-solid fa-sun text-amber-400"></i>
+                    <span id="themeToggleText" class="hidden sm:inline">Modo Claro</span>
+                </button>
+
+                <!-- API Key Status Button -->
+                <button id="apiKeyModalBtn" onclick="toggleApiKeyModal()" class="flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition">
+                    <span id="apiKeyDot" class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    <span id="apiKeyStatusText" class="hidden sm:inline">Configurar API Key</span>
+                    <i class="fa-solid fa-key text-slate-400"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- LEFT COLUMN: Parameter Configuration Form (7 Cols) -->
+        <section class="lg:col-span-7 flex flex-col space-y-5">
+
+            <!-- Parameters Form -->
+            <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-4 transition-colors duration-200">
+                <div class="border-b border-slate-200 dark:border-slate-800 pb-3 flex items-center justify-between">
+                <h2 class="text-sm font-semibold text-slate-900 dark:text-white flex items-center">
+                    <i class="fa-solid fa-sliders text-blue-500 mr-2"></i> Configuración del Escenario Granular
+                </h2>
+                <span class="text-xs text-slate-500">Parámetros v3.0.12</span>
+            </div>
+
+                <!-- Target AI Engine & Aspect Ratio -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1.5">Motor de Generación de Imagen</label>
+                        <select id="targetEngine" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500 transition">
+                            <option value="Flux.1 Pro/Dev (Natural Language, Ultra-detailed)">Flux.1 (Recomendado - Lenguaje Natural)</option>
+                            <option value="Midjourney v6.1 (Uses --ar flags and concise aesthetic prompt)">Midjourney v6.1</option>
+                            <option value="Google Imagen 3 (Photorealistic, balanced photographic descriptions)">Google Imagen 3</option>
+                            <option value="DALL-E 3 (Detailed spatial description)">DALL-E 3</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1.5">Relación de Aspecto (Aspect Ratio)</label>
+                        <select id="aspectRatio" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500 transition">
+                            <option value="16:9 (Horizontal / Editorial Landscape)">16:9 (Horizontal Editorial)</option>
+                            <option value="4:3 (Standard Corporate Portrait)">4:3 (Retrato Estándar)</option>
+                            <option value="1:1 (Square Profile)">1:1 (Cuadrado)</option>
+                            <option value="9:16 (Vertical Mobile / Story)">9:16 (Vertical Mobile)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Demographic Granular Controls -->
+                <div class="bg-slate-50/80 dark:bg-slate-950/60 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800/80 space-y-3">
+                    <span class="text-[11px] font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider block">
+                        <i class="fa-solid fa-user-gear mr-1"></i> Perfil Demográfico & Profesional
+                    </span>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Profesión de Referencia</label>
+                            <select id="professionSelect" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500 transition">
+                                <option value="Business Administration / Executive Management">Administración de empresas</option>
+                                <option value="Commercial Engineering / Business Development">Ingeniería Comercial</option>
+                                <option value="Advertising & Marketing Specialist">Publicidad y Marketing</option>
+                                <option value="Law / Legal Attorney & Legal Counsel">Derecho (Legal)</option>
+                                <option value="Public Accountant / Financial Auditor">Contaduría Pública (Contabilidad)</option>
+                                <option value="Organizational / Corporate Psychologist">Psicología</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Ubicación / Nacionalidad</label>
+                            <select id="nationalitySelect" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500 transition">
+                                <option value="Bolivian context (Andean / Mestizo professional features)">Basado en Bolivia</option>
+                                <option value="Argentine context (Rioplatense / South American professional)">Basado en Argentina</option>
+                                <option value="Peruvian context (Andean / Peruvian professional features)">Basado en Perú</option>
+                                <option value="Mexican context (Mesoamerican / Mexican professional features)">Basado en México</option>
+                                <option value="Brazilian context (South American / Brazilian corporate features)">Basado en Brasil</option>
+                                <option value="Paraguayan context (Guarani / Paraguayan corporate features)">Basado en Paraguay</option>
+                                <option value="Colombian context (Colombian corporate executive features)">Basado en Colombia</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Identidad de Género</label>
+                            <select id="genderSelect" onchange="onGenderChange()" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500 transition">
+                                <option value="Male professional">Masculino</option>
+                                <option value="Female professional">Femenino</option>
+                                <option value="Non-binary / Androgynous professional">Andrógino / Neutral</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Rango de Edad</label>
+                            <select id="ageRangeSelect" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500 transition">
+                                <option value="25-32 years old (Young rising professional)">25-32 años (Joven Profesional)</option>
+                                <option value="33-42 years old (Consolidated mid-career executive)">33-42 años (Ejecutivo Consolidado)</option>
+                                <option value="43-55 years old (Senior C-level Director)">43-55 años (Director Senior)</option>
+                                <option value="55+ years old (Senior Managing Partner)">55+ años (Socio Senior)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Dispositivo Utilizado</label>
+                            <select id="deviceSelect" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500 transition">
+                                <option value="Official paper documents with classic ballpoint pen">Documentos y bolígrafo</option>
+                                <option value="Sleek modern desktop computer (Mac style all-in-one monitor)">Computadora de escritorio (Mac)</option>
+                                <option value="Ultra-thin sleek metallic laptop">Laptop Ultradelgada Metálica</option>
+                                <option value="Executive tablet with digital stylus">Tablet Ejecutiva con Lápiz Óptico</option>
+                                <option value="Flagship smartphone in subtle corporate hold">Smartphone Premium</option>
+                                <option value="No electronic devices (Natural open pose with eye contact)">Sin Dispositivos (Manos Libres)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DYNAMIC STYLE CONTROLS -->
+                <div class="bg-slate-50/80 dark:bg-slate-950/60 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800/80 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider block">
+                            <i class="fa-solid fa-shirt mr-1"></i> Estilo Personal, Vestimenta & Accesorios
+                        </span>
+                        <span class="text-[10px] text-indigo-500 dark:text-indigo-300/70 font-mono"><i class="fa-solid fa-arrows-rotate mr-1"></i>Dinámico según Género</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Estilo de Cabello (Incluye Ondulado)</label>
+                            <select id="hairStyleSelect" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500 transition">
+                                <!-- Populated dynamically based on Gender -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Accesorios</label>
+                            <select id="accessoriesSelect" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500 transition">
+                                <option value="Minimalist understated wristwatch only">Reloj de pulsera analógico sobrio</option>
+                                <option value="Subtle premium thin-frame reading glasses and subtle watch">Lentes de marco fino y reloj ejecutivo</option>
+                                <option value="Discreet luxury gold wedding band and subtle earrings">Anillo / matrimonio y aretes sutiles</option>
+                                <option value="Modern minimalist smart watch and clear reading glasses">Reloj inteligente y lentes de lectura</option>
+                                <option value="No visible accessories for an ultra-clean corporate aesthetic">Sin accesorios (Estilo ultra limpio)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Tipo de Prenda</label>
+                            <select id="apparelTypeSelect" onchange="onApparelTypeChange()" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500 transition">
+                                <!-- Populated dynamically based on Gender -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Color de Prenda (Paleta Dinámica)</label>
+                            <select id="apparelColorSelect" onchange="onApparelColorChange()" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500 transition">
+                                <!-- Populated dynamically based on Apparel Type -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Visual Color Swatches Preview Bar -->
+                    <div class="pt-1 border-t border-slate-200 dark:border-slate-900">
+                        <span class="text-[10px] text-slate-500 dark:text-slate-400 mb-1.5 block font-medium flex items-center justify-between">
+                            <span><i class="fa-solid fa-palette text-amber-500 mr-1"></i> Muestras Visuales de Color:</span>
+                            <span id="selectedColorNameText" class="text-indigo-600 dark:text-indigo-300 font-mono text-[10px]"></span>
+                        </span>
+                        <div id="colorSwatchesContainer" class="flex flex-wrap items-center gap-2 py-1">
+                            <!-- Populated dynamically with interactive color chips -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Raw Action / Context Textarea -->
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="block text-xs font-medium text-slate-700 dark:text-slate-300">
+                            Acción o Contexto <span class="text-blue-600 dark:text-blue-400 font-normal">(Escribe libremente en español)</span>
+                        </label>
+                        <span class="text-[10px] text-slate-500">Procesamiento multilingüe</span>
+                    </div>
+                    <textarea id="actionInput" rows="3" placeholder="Pega aquí el concepto o texto en español. Ej: 'vía voluntaria notarial es el trámite legal mediante el cual un ciudadano revisa documentos de acuerdos mutuos en oficina...'" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500 transition custom-scrollbar"></textarea>
+                </div>
+
+                <!-- Environment & Setting -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1.5">Entorno / Oficina (Optimizado por Profesión)</label>
+                        <select id="environmentSelect" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500 transition">
+                            <option value="Executive notary office with polished mahogany desk, leather bound books, brass lamp, and legal certificates (Law / Legal)">Despacho Notarial / Legal Elegante (Derecho / Legal)</option>
+                            <option value="High-floor C-Suite executive board office with mahogany conference table and panoramic city skyscraper view (Business Admin)">Oficina C-Suite Ejecutiva con Vista Panorámica (Adm. Empresas)</option>
+                            <option value="Modern corporate analytics hub with subtle financial charts, growth dashboards, and glass whiteboards (Commercial Eng.)">Sala de Análisis Corporativo y Métricas (Ingeniería Comercial)</option>
+                            <option value="Creative advertising agency studio with design moodboards, stylish warm lighting, and brand color swatches (Marketing)">Estudio Creativo de Agencia con Moodboards (Marketing)</option>
+                            <option value="Clean structured corporate financial auditing office with organized balance spreadsheets and calculator (Accounting)">Despacho de Auditoría Financiera y Balances (Contaduría)</option>
+                            <option value="Warm, serene corporate counseling office with comfortable armchairs, soft indoor foliage, and soothing natural light (Psychology)">Consultorio Corporativo y Psicología Organizacional (Psicología)</option>
+                            <option value="Modern brightly lit corporate office with large glass windows and soft blurred background architecture">Oficina Corporativa Moderna (Ventanales Generales)</option>
+                            <option value="High-tech minimalist glass conference room with subtle warm interior lighting">Sala de Conferencias Tech Minimalista</option>
+                            <option value="Cozy modern co-working hub with soft ambient lighting and indoor plants">Co-working Hub Moderno e Innovador</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1.5">Iluminación & Atmósfera</label>
+                        <select id="lightingSelect" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500 transition">
+                            <option value="Soft natural morning sunlight streaming from window, clean editorial highlights">Luz Natural de Mañana (Editorial)</option>
+                            <option value="Cinematic soft key light, gentle fill, high color accuracy, corporate moody luxury">Cinematográfica Suave (Moody Executive)</option>
+                            <option value="Balanced studio softbox illumination, clean professional shadow gradients">Estudio Softbox Balanceado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Camera & Lens Specs -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1.5">Cámara, Lente y Encuadre</label>
+                    <select id="cameraSelect" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500 transition">
+                        <option value="50mm prime lens at f/2.8, eye-level frontal portrait, shallow depth of field, sharp focus on subject eyes">50mm f/2.8 - Retrato Frontal (Fondo Suave)</option>
+                        <option value="85mm telephoto lens at f/1.8, close medium shot, beautiful creamy bokeh background">85mm f/1.8 - Plano Medio Cerca (Bokeh Profesional)</option>
+                        <option value="35mm wide angle editorial photography, environmental corporate portrait">35mm f/4.0 - Gran Angular Editorial (Entorno Completo)</option>
+                    </select>
+                </div>
+
+                <!-- Additional Aesthetic Instructions -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1.5">Instrucciones Estéticas Adicionales (Opcional)</label>
+                    <input type="text" id="customNotes" placeholder="Ej: Piel natural con poros reales, evitar efectos artificiales, tonos azulados y cálidos..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500 transition">
+                </div>
+
+                <!-- Generate Button -->
+                <button id="generateBtn" onclick="generatePromptWithGemini()" class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold rounded-xl shadow-lg shadow-blue-600/25 transition flex items-center justify-center space-x-2 text-sm">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Generar Prompt Optimizado v3.0.12 con Gemini AI</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- RIGHT COLUMN: Output & Preview (5 Cols) -->
+        <section class="lg:col-span-5 flex flex-col space-y-5">
+            
+            <!-- Output Box Card -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col h-full min-h-[420px]">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+                    <div class="flex items-center space-x-2">
+                        <div id="statusBadge" class="px-2.5 py-1 rounded-full text-xs font-medium flex items-center space-x-1.5 bg-slate-800 text-slate-400 border border-slate-700 transition-all">
+                            <span id="statusDot" class="w-2 h-2 rounded-full bg-slate-500"></span>
+                            <span id="statusText">Listo para generar</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <button onclick="copyPromptToClipboard()" id="copyBtn" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition flex items-center space-x-1">
+                            <i class="fa-regular fa-copy"></i>
+                            <span id="copyBtnText">Copiar</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Prompt Content Area -->
+                <div class="relative flex-1 bg-slate-950 border border-slate-800/80 rounded-xl p-4 font-mono text-xs text-slate-200 leading-relaxed overflow-y-auto custom-scrollbar select-text" id="promptOutputContainer">
+                    <p id="promptPlaceholder" class="text-slate-500 italic font-sans flex flex-col items-center justify-center h-full text-center p-6">
+                        <i class="fa-solid fa-terminal text-3xl mb-3 text-slate-700"></i>
+                        Ajusta los parámetros y haz clic en "Generar Prompt" para obtener la versión optimizada en inglés redactada por la IA.
+                    </p>
+                    <div id="loadingState" class="hidden flex-col items-center justify-center h-full text-center space-y-3 py-12">
+                        <div class="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                        <p class="text-xs text-blue-400 font-sans animate-pulse">Sintetizando perfil, vestimenta y entorno en inglés con Gemini...</p>
+                    </div>
+                    <p id="promptResultText" class="hidden whitespace-pre-wrap selection:bg-blue-500 selection:text-white"></p>
+                </div>
+
+                <!-- Action Toolbar for Output -->
+                <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between gap-2">
+                    <button id="testImageBtn" onclick="testGenerateImage()" disabled class="flex-1 py-2 px-3 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed border border-slate-700 rounded-xl text-xs font-medium text-slate-200 transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-image text-indigo-400"></i>
+                        <span>Probar Generación de Imagen</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Test Image Rendering Canvas Card -->
+            <div id="testImageCard" class="hidden bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-semibold text-slate-300 flex items-center">
+                        <i class="fa-solid fa-eye text-blue-400 mr-2"></i> Vista Previa Generada (Gemini Flash Image)
+                    </span>
+                    <button onclick="closeImagePreview()" class="text-slate-500 hover:text-slate-300 text-xs">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="relative bg-slate-950 rounded-xl border border-slate-800 overflow-hidden min-h-[220px] flex items-center justify-center">
+                    <div id="imageLoader" class="hidden flex-col items-center space-y-2 p-6 text-center">
+                        <div class="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                        <span class="text-xs text-slate-400">Renderizando imagen con `gemini-3.1-flash-lite-image`...</span>
+                    </div>
+                    <img id="previewImg" src="" alt="Vista previa del prompt" class="hidden w-full h-auto object-cover max-h-[400px]">
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <footer class="border-t border-slate-200 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/50 backdrop-blur py-4 mt-auto transition-colors duration-200">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 dark:text-slate-400 font-mono flex items-center justify-center space-x-1.5">
+            <span>Created by</span>
+            <span class="font-semibold text-slate-800 dark:text-slate-200">Moises Luna</span>
+            <span>for</span>
+            <span class="text-blue-600 dark:text-blue-400 font-semibold">Unifranz Online 2026</span>
+        </div>
+    </footer>
+
+    <div id="apiKeyModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="font-bold text-base text-white flex items-center">
+                    <i class="fa-solid fa-key text-amber-400 mr-2"></i> Configuración de API Key
+                </h3>
+                <button onclick="toggleApiKeyModal()" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <p class="text-xs text-slate-400 leading-relaxed">
+                Ingresa tu clave de API de **Google AI Studio**. La clave se guardará localmente en tu navegador (`localStorage`) y nunca será transmitida a ningún servidor externo.
+            </p>
+            <div>
+                <label class="block text-xs font-medium text-slate-300 mb-1">Google AI Studio API Key</label>
+                <input type="password" id="apiKeyInput" placeholder="AIzaSy..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 font-mono focus:outline-none focus:border-blue-500">
+            </div>
+            <div class="flex items-center justify-end space-x-2 pt-2">
+                <button onclick="clearApiKey()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-xl transition">Limpiar</button>
+                <button onclick="saveApiKey()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs rounded-xl transition">Guardar Clave</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 border border-slate-700 text-white px-4 py-2.5 rounded-xl text-xs shadow-xl transition opacity-0 pointer-events-none z-50 flex items-center space-x-2">
+        <i id="toastIcon" class="fa-solid fa-info-circle text-blue-400"></i>
+        <span id="toastMessage">Notificación</span>
+    </div>
+
+    <!-- Client-Side Authentication Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-5 transition-colors">
+            <div class="text-center space-y-2">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mx-auto shadow-lg shadow-blue-500/30">
+                    <i class="fa-solid fa-lock text-white text-xl"></i>
+                </div>
+                <h2 class="text-lg font-bold text-slate-900 dark:text-white">Acceso al Sistema</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Ingresa tus credenciales autorizadas para acceder al Hyper-Real Prompt Engine v3.0.12</p>
+            </div>
+
+            <form onsubmit="handleLoginSubmit(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Usuario</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-user absolute left-3 top-3 text-slate-400 text-xs"></i>
+                        <input type="text" id="loginUsername" required placeholder="Nombre de usuario" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl pl-8 pr-3 py-2 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Contraseña</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-key absolute left-3 top-3 text-slate-400 text-xs"></i>
+                        <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl pl-8 pr-3 py-2 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition">
+                    </div>
+                </div>
+
+                <p id="loginErrorMsg" class="hidden text-[11px] text-rose-500 text-center font-medium pt-1">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Usuario o contraseña incorrectos
+                </p>
+
+                <button type="submit" class="w-full py-2.5 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold rounded-xl text-xs shadow-lg shadow-blue-500/20 transition mt-2">
+                    Iniciar Sesión
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // HARDCODED USERS DATABASE (Fácilmente editable desde este objeto)
+        const USERS_DB = {
+            "Moises": "Moi123",
+            "Isra": "Isra",
+            "Pasante": "Etech2026",
+            "Adriana": "Adri2026"
+        };
+
+        // State variables
+        let currentGeneratedPrompt = "";
+        let currentStatusState = "ready"; // 'ready' | 'generating' | 'generated' | 'modified'
+
+        // On Load initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            checkUserSession();
+            checkStoredApiKey();
+            resetAllParameters(false); // Initialize default parameters
+            attachParameterChangeListeners();
+        });
+
+        // Authentication Functions
+        function checkUserSession() {
+            const loggedUser = localStorage.getItem('logged_user');
+            const loginModal = document.getElementById('loginModal');
+            const userProfileBadge = document.getElementById('userProfileBadge');
+            const currentUserDisplay = document.getElementById('currentUserDisplay');
+
+            if (loggedUser && USERS_DB[loggedUser]) {
+                loginModal.classList.add('hidden');
+                userProfileBadge.classList.remove('hidden');
+                userProfileBadge.classList.add('flex');
+                currentUserDisplay.innerText = loggedUser;
+            } else {
+                loginModal.classList.remove('hidden');
+                userProfileBadge.classList.add('hidden');
+                userProfileBadge.classList.remove('flex');
+            }
+        }
+
+        function handleLoginSubmit(event) {
+            event.preventDefault();
+            const usernameInput = document.getElementById('loginUsername').value.trim();
+            const passwordInput = document.getElementById('loginPassword').value.trim();
+            const errorMsg = document.getElementById('loginErrorMsg');
+
+            if (USERS_DB[usernameInput] && USERS_DB[usernameInput] === passwordInput) {
+                localStorage.setItem('logged_user', usernameInput);
+                errorMsg.classList.add('hidden');
+                document.getElementById('loginUsername').value = "";
+                document.getElementById('loginPassword').value = "";
+                checkUserSession();
+                showToast(`¡Bienvenido/a, ${usernameInput}!`, "success");
+            } else {
+                errorMsg.classList.remove('hidden');
+            }
+        }
+
+        function logoutUser() {
+            localStorage.removeItem('logged_user');
+            checkUserSession();
+            showToast("Sesión cerrada", "info");
+        }
+
+        // Update Generation Status Indicator Badge
+        function updateStatusState(newState) {
+            currentStatusState = newState;
+            const badge = document.getElementById('statusBadge');
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+
+            if (!badge || !dot || !text) return;
+
+            if (newState === 'generating') {
+                badge.className = "px-2.5 py-1 rounded-full text-xs font-medium flex items-center space-x-1.5 bg-blue-500/10 text-blue-400 border border-blue-500/30 animate-pulse";
+                dot.className = "w-2 h-2 rounded-full bg-blue-500 animate-ping";
+                text.innerText = "Generando prompt con IA...";
+            } else if (newState === 'generated') {
+                badge.className = "px-2.5 py-1 rounded-full text-xs font-medium flex items-center space-x-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30";
+                dot.className = "w-2 h-2 rounded-full bg-emerald-500";
+                text.innerText = "Prompt Generado Exitosamente";
+            } else if (newState === 'modified') {
+                badge.className = "px-2.5 py-1 rounded-full text-xs font-medium flex items-center space-x-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/30";
+                dot.className = "w-2 h-2 rounded-full bg-amber-500";
+                text.innerText = "Parámetros modificados (Pendiente generar)";
+            } else { // 'ready'
+                badge.className = "px-2.5 py-1 rounded-full text-xs font-medium flex items-center space-x-1.5 bg-slate-800 text-slate-400 border border-slate-700";
+                dot.className = "w-2 h-2 rounded-full bg-slate-500";
+                text.innerText = "Listo para generar";
+            }
+        }
+
+        // Attach change listeners to form inputs to detect parameter changes
+        function attachParameterChangeListeners() {
+            const inputs = document.querySelectorAll('select, textarea, input');
+            inputs.forEach(input => {
+                input.addEventListener('change', () => {
+                    if (currentStatusState === 'generated') {
+                        updateStatusState('modified');
+                    }
+                });
+                if (input.tagName === 'TEXTAREA' || input.type === 'text') {
+                    input.addEventListener('input', () => {
+                        if (currentStatusState === 'generated') {
+                            updateStatusState('modified');
+                        }
+                    });
+                }
+            });
+        }
+
+        // Theme Toggle Functionality
+        function toggleTheme() {
+            const htmlEl = document.documentElement;
+            const themeIcon = document.getElementById('themeToggleIcon');
+            const themeText = document.getElementById('themeToggleText');
+
+            if (htmlEl.classList.contains('dark')) {
+                htmlEl.classList.remove('dark');
+                themeIcon.className = "fa-solid fa-moon text-indigo-600";
+                themeText.innerText = "Modo Oscuro";
+                localStorage.setItem('app_theme', 'light');
+            } else {
+                htmlEl.classList.add('dark');
+                themeIcon.className = "fa-solid fa-sun text-amber-400";
+                themeText.innerText = "Modo Claro";
+                localStorage.setItem('app_theme', 'dark');
+            }
+        }
+
+        // Global Reset Functionality
+        function resetAllParameters(notify = true) {
+            document.getElementById('targetEngine').selectedIndex = 0;
+            document.getElementById('aspectRatio').selectedIndex = 0;
+            document.getElementById('professionSelect').selectedIndex = 0;
+            document.getElementById('nationalitySelect').selectedIndex = 0;
+            document.getElementById('genderSelect').value = "Male professional";
+            onGenderChange();
+
+            document.getElementById('ageRangeSelect').selectedIndex = 0;
+            document.getElementById('deviceSelect').selectedIndex = 0;
+            
+            updateHairStyleOptions("Short naturally wavy corporate hair style with clean side part");
+            document.getElementById('accessoriesSelect').selectedIndex = 0;
+            
+            updateApparelTypeOptions("Tailored two-piece executive suit with structured blazer and silk tie", "Classic Midnight Navy Blue corporate tone");
+
+            document.getElementById('actionInput').value = "";
+            if (document.getElementById('customNotes')) {
+                document.getElementById('customNotes').value = "";
+            }
+            document.getElementById('environmentSelect').selectedIndex = 0;
+            document.getElementById('lightingSelect').selectedIndex = 0;
+            document.getElementById('cameraSelect').selectedIndex = 0;
+
+            updateStatusState('ready');
+
+            if (notify) {
+                showToast("Todos los parámetros han sido restablecidos", "info");
+            }
+        }
+
+        // Hair options dataset mapped by gender
+        const hairOptionsByGender = {
+            male: [
+                { value: "Short naturally wavy corporate hair style with clean side part", label: "Corto ondulado natural con raya al lado" },
+                { value: "Medium length executive hair with soft wavy texture and volume", label: "Medio ondulado sobrio con volumen ejecutivo" },
+                { value: "Classic short neat professional haircut with clean side part", label: "Corto lacio clásico pulcro con raya al lado" },
+                { value: "Modern neatly faded short executive haircut with wavy top texture", label: "Corto moderno (Fade) con ondas texturizadas" },
+                { value: "Slicked back mature grey-touched executive hair with soft wave", label: "Peinado hacia atrás ondulado con canas maduras" },
+                { value: "Clean shaven executive bald look with neat beard option", label: "Cabeza afeitada / Rapado pulcro" }
+            ],
+            female: [
+                { value: "Medium length professional soft wavy hair style falling gracefully", label: "Medio ondulado suave y elegante (Hombros)" },
+                { value: "Long lush naturally wavy styled dark hair with subtle volume", label: "Largo ondulado natural con cuerpo y brillo" },
+                { value: "Elegant wavy executive bob haircut with side parting", label: "Corte Bob ondulado estructurado elegante" },
+                { value: "Sleek executive updo bun hair styling", label: "Recogido moño ejecutivo pulcro" },
+                { value: "Long smooth straight styled dark hair", label: "Largo lacio peinado ejecutivo" },
+                { value: "Shoulder-length layered corporate cut with gentle wave", label: "Melena en capas con ondas suaves" }
+            ],
+            neutral: [
+                { value: "Medium wavy naturally layered executive hair style", label: "Medio ondulado neutro en capas" },
+                { value: "Modern short layered textured wavy haircut", label: "Corto ondulado texturizado" },
+                { value: "Sleek low ponytail corporate style", label: "Coleta baja pulcra" },
+                { value: "Medium wavy slicked back executive hair style", label: "Medio ondulado peinado hacia atrás" }
+            ]
+        };
+
+        // Apparel options dataset mapped by gender
+        const apparelOptionsByGender = {
+            male: [
+                { category: "suit", value: "Tailored two-piece executive suit with structured blazer and silk tie", label: "Traje formal sastre de 2 piezas (Saco y corbata)" },
+                { category: "blazer", value: "Tailored executive blazer over crisp oxford shirt (no tie)", label: "Blazer entallado sobre camisa oxford (Sin corbata)" },
+                { category: "shirt", value: "Buttoned executive dress shirt with tailored trousers", label: "Camisa de vestir abotonada sin saco" },
+                { category: "vest", value: "Elegantly fitted vest over white formal dress shirt", label: "Chaleco de vestir entallado sobre camisa formal" },
+                { category: "knitwear", value: "Premium fine-knit merino wool sweater over collared shirt", label: "Jersey de punto fino de lana sobre camisa" }
+            ],
+            female: [
+                { category: "suit", value: "Tailored women's suit with elegant blazer and subtle blouse", label: "Sastre femenino con blazer estructurado" },
+                { category: "blazer", value: "Executive blazer over minimalist silk top", label: "Blazer ejecutivo sobre blusa de seda" },
+                { category: "dress", value: "Sober structured executive sheath dress", label: "Vestido ejecutivo de corte sobrio" },
+                { category: "shirt", value: "Formal silk blouse with tailored dress trousers", label: "Blusa formal de seda con pantalones de vestir" },
+                { category: "knitwear", value: "Fine-knit executive cardigan over formal blouse", label: "Cárdigan de punto fino sobre blusa formal" }
+            ],
+            neutral: [
+                { category: "blazer", value: "Tailored gender-neutral blazer over crisp formal shirt", label: "Blazer neutro estructurado sobre camisa" },
+                { category: "shirt", value: "Crisp button-down formal shirt with dress trousers", label: "Camisa formal abotonada corte recto" },
+                { category: "knitwear", value: "Minimalist crewneck merino wool sweater over formal shirt", label: "Jersey de punto neutro sobre camisa" }
+            ]
+        };
+
+        // Color palettes dataset with color visualizer codes mapped by apparel category
+        const colorPalettesByCategory = {
+            suit: [
+                { value: "Classic Midnight Navy Blue corporate tone", label: "Azul Marino Clásico", colors: ["#0f172a", "#1e3a8a"] },
+                { value: "Dark Charcoal Grey sophisticated tone", label: "Gris Antracita", colors: ["#334155", "#1e293b"] },
+                { value: "Immaculate Jet Black corporate finish", label: "Negro Ejecutivo", colors: ["#090d16", "#18181b"] },
+                { value: "Deep Burgundy Wine executive accent tone", label: "Vino Tinto / Borgoña", colors: ["#450a0a", "#881337"] },
+                { value: "Deep Forest Green executive tone", label: "Verde Bosque / Esmeralda", colors: ["#064e3b", "#022c22"] }
+            ],
+            blazer: [
+                { value: "Classic Midnight Navy Blue corporate tone", label: "Azul Marino Clásico", colors: ["#0f172a", "#1e3a8a"] },
+                { value: "Dark Charcoal Grey sophisticated tone", label: "Gris Antracita", colors: ["#334155", "#1e293b"] },
+                { value: "Warm Sober Earth Tones (Beige, Taupe, Deep Brown)", label: "Beige / Taupe / Tierra", colors: ["#d97706", "#78350f"] },
+                { value: "Deep Burgundy Wine executive accent tone", label: "Vino Tinto / Borgoña", colors: ["#450a0a", "#881337"] },
+                { value: "Immaculate Jet Black corporate finish", label: "Negro Ejecutivo", colors: ["#090d16", "#18181b"] }
+            ],
+            shirt: [
+                { value: "Crisp Light Blue and White institutional palette", label: "Azul Claro y Blanco", colors: ["#e0f2fe", "#0284c7"] },
+                { value: "Immaculate White executive shirt tone", label: "Blanco Marfil Impecable", colors: ["#ffffff", "#cbd5e1"] },
+                { value: "Soft Pale Pink executive tone", label: "Rosa Palo / Rubor Sutil", colors: ["#fce7f3", "#f472b6"] },
+                { value: "Midnight Navy Blue formal shirt tone", label: "Azul Marino Intenso", colors: ["#0f172a", "#1d4ed8"] },
+                { value: "Dark Charcoal Grey shirt palette", label: "Gris Antracita / Negro", colors: ["#27272a", "#090d16"] }
+            ],
+            vest: [
+                { value: "Dark Charcoal Grey sophisticated tone", label: "Gris Antracita", colors: ["#334155", "#1e293b"] },
+                { value: "Classic Midnight Navy Blue corporate tone", label: "Azul Marino Clásico", colors: ["#0f172a", "#1e3a8a"] },
+                { value: "Immaculate Jet Black corporate finish", label: "Negro Ejecutivo", colors: ["#090d16", "#18181b"] },
+                { value: "Warm Sober Earth Tones (Beige, Taupe, Deep Brown)", label: "Tonos Tierra / Beige", colors: ["#b45309", "#78350f"] }
+            ],
+            dress: [
+                { value: "Classic Midnight Navy Blue corporate tone", label: "Azul Marino Profesional", colors: ["#0f172a", "#1e3a8a"] },
+                { value: "Dark Charcoal Grey sophisticated tone", label: "Gris Antracita", colors: ["#334155", "#1e293b"] },
+                { value: "Immaculate Jet Black corporate finish", label: "Negro Clásico Atemporal", colors: ["#090d16", "#18181b"] },
+                { value: "Deep Burgundy Wine executive accent tone", label: "Borgoña / Vino Ejecutivo", colors: ["#450a0a", "#881337"] },
+                { value: "Warm Sober Earth Tones (Beige, Taupe, Deep Brown)", label: "Beige Champaña / Taupe", colors: ["#d97706", "#78350f"] }
+            ],
+            knitwear: [
+                { value: "Heather Charcoal Grey knit tone", label: "Gris Marengo Jaspeado", colors: ["#475569", "#334155"] },
+                { value: "Classic Midnight Navy Blue corporate tone", label: "Azul Marino Clásico", colors: ["#0f172a", "#1e3a8a"] },
+                { value: "Warm Sober Earth Tones (Camel, Taupe, Tan)", label: "Camel / Marrón Cálido", colors: ["#d97706", "#b45309"] },
+                { value: "Deep Burgundy Wine executive accent tone", label: "Granate / Vino", colors: ["#9f1239", "#881337"] },
+                { value: "Sober Olive Green knit tone", label: "Verde Oliva Sobrio", colors: ["#3f6212", "#365314"] }
+            ]
+        };
+
+        function getGenderKey() {
+            const genderVal = document.getElementById('genderSelect').value;
+            if (genderVal.includes("Female")) return "female";
+            if (genderVal.includes("Male")) return "male";
+            return "neutral";
+        }
+
+        function onGenderChange() {
+            updateHairStyleOptions();
+            updateApparelTypeOptions();
+        }
+
+        function updateHairStyleOptions(selectedHairVal = null) {
+            const genderKey = getGenderKey();
+            const hairSelect = document.getElementById('hairStyleSelect');
+            const options = hairOptionsByGender[genderKey] || hairOptionsByGender.neutral;
+
+            hairSelect.innerHTML = "";
+            options.forEach(opt => {
+                const optionEl = document.createElement('option');
+                optionEl.value = opt.value;
+                optionEl.innerText = opt.label;
+                hairSelect.appendChild(optionEl);
+            });
+
+            if (selectedHairVal) {
+                hairSelect.value = selectedHairVal;
+            }
+        }
+
+        function updateApparelTypeOptions(selectedApparelVal = null, selectedColorVal = null) {
+            const genderKey = getGenderKey();
+            const apparelSelect = document.getElementById('apparelTypeSelect');
+            const options = apparelOptionsByGender[genderKey] || apparelOptionsByGender.neutral;
+
+            apparelSelect.innerHTML = "";
+            options.forEach(opt => {
+                const optionEl = document.createElement('option');
+                optionEl.value = opt.value;
+                optionEl.innerText = opt.label;
+                optionEl.dataset.category = opt.category;
+                apparelSelect.appendChild(optionEl);
+            });
+
+            if (selectedApparelVal) {
+                apparelSelect.value = selectedApparelVal;
+            }
+
+            updateApparelColorOptions(selectedColorVal);
+        }
+
+        function onApparelTypeChange() {
+            updateApparelColorOptions();
+        }
+
+        function updateApparelColorOptions(selectedColorVal = null) {
+            const apparelSelect = document.getElementById('apparelTypeSelect');
+            const selectedOption = apparelSelect.options[apparelSelect.selectedIndex];
+            const category = selectedOption ? selectedOption.dataset.category : "suit";
+
+            const colorSelect = document.getElementById('apparelColorSelect');
+            const paletteOptions = colorPalettesByCategory[category] || colorPalettesByCategory.suit;
+
+            colorSelect.innerHTML = "";
+            paletteOptions.forEach(opt => {
+                const optionEl = document.createElement('option');
+                optionEl.value = opt.value;
+                optionEl.innerText = opt.label;
+                colorSelect.appendChild(optionEl);
+            });
+
+            if (selectedColorVal) {
+                colorSelect.value = selectedColorVal;
+            }
+
+            renderColorSwatches(paletteOptions);
+        }
+
+        function onApparelColorChange() {
+            const apparelSelect = document.getElementById('apparelTypeSelect');
+            const selectedOption = apparelSelect.options[apparelSelect.selectedIndex];
+            const category = selectedOption ? selectedOption.dataset.category : "suit";
+            const paletteOptions = colorPalettesByCategory[category] || colorPalettesByCategory.suit;
+
+            renderColorSwatches(paletteOptions);
+        }
+
+        function renderColorSwatches(paletteOptions) {
+            const container = document.getElementById('colorSwatchesContainer');
+            const selectedColorVal = document.getElementById('apparelColorSelect').value;
+            const textBadge = document.getElementById('selectedColorNameText');
+
+            container.innerHTML = "";
+
+            paletteOptions.forEach(opt => {
+                const isSelected = opt.value === selectedColorVal;
+                
+                if (isSelected && textBadge) {
+                    textBadge.innerText = opt.label;
+                }
+
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.onclick = () => {
+                    document.getElementById('apparelColorSelect').value = opt.value;
+                    onApparelColorChange();
+                };
+
+                const activeClasses = isSelected 
+                    ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-white dark:ring-offset-slate-950 scale-105 border-slate-400 dark:border-white' 
+                    : 'opacity-70 hover:opacity-100 border-slate-300 dark:border-slate-700 hover:border-slate-500';
+
+                button.className = `group relative px-2 py-1 rounded-lg bg-white dark:bg-slate-900 border text-[11px] flex items-center space-x-1.5 transition duration-150 ${activeClasses}`;
+
+                const color1 = opt.colors[0];
+                const color2 = opt.colors[1] || opt.colors[0];
+                const swatchDot = document.createElement('span');
+                swatchDot.className = "w-3.5 h-3.5 rounded-full shadow-inner inline-block border border-black/10 dark:border-white/20";
+                swatchDot.style.background = `linear-gradient(135deg, ${color1} 50%, ${color2} 50%)`;
+
+                const labelSpan = document.createElement('span');
+                labelSpan.className = "text-slate-700 dark:text-slate-300 font-medium text-[10px]";
+                labelSpan.innerText = opt.label;
+
+                button.appendChild(swatchDot);
+                button.appendChild(labelSpan);
+                container.appendChild(button);
+            });
+        }
+
+        function toggleApiKeyModal() {
+            const modal = document.getElementById('apiKeyModal');
+            modal.classList.toggle('hidden');
+        }
+
+        function checkStoredApiKey() {
+            const storedKey = localStorage.getItem('gemini_api_key');
+            const dot = document.getElementById('apiKeyDot');
+            const text = document.getElementById('apiKeyStatusText');
+            if (storedKey) {
+                dot.className = "w-2 h-2 rounded-full bg-emerald-500";
+                text.innerText = "API Key Configurada";
+                document.getElementById('apiKeyInput').value = storedKey;
+            } else {
+                dot.className = "w-2 h-2 rounded-full bg-amber-500";
+                text.innerText = "Configurar API Key";
+            }
+        }
+
+        function saveApiKey() {
+            const key = document.getElementById('apiKeyInput').value.trim();
+            if (key) {
+                localStorage.setItem('gemini_api_key', key);
+                showToast("API Key guardada localmente", "success");
+            } else {
+                localStorage.removeItem('gemini_api_key');
+                showToast("API Key eliminada", "info");
+            }
+            checkStoredApiKey();
+            toggleApiKeyModal();
+        }
+
+        function clearApiKey() {
+            localStorage.removeItem('gemini_api_key');
+            document.getElementById('apiKeyInput').value = "";
+            checkStoredApiKey();
+            showToast("API Key eliminada", "info");
+            toggleApiKeyModal();
+        }
+
+        async function generatePromptWithGemini() {
+            const generateBtn = document.getElementById('generateBtn');
+            const placeholder = document.getElementById('promptPlaceholder');
+            const loadingState = document.getElementById('loadingState');
+            const resultText = document.getElementById('promptResultText');
+            const testImageBtn = document.getElementById('testImageBtn');
+
+            // Collect UI Data v3.0.9
+            const formData = {
+                targetEngine: document.getElementById('targetEngine').value,
+                aspectRatio: document.getElementById('aspectRatio').value,
+                profession: document.getElementById('professionSelect').value,
+                nationality: document.getElementById('nationalitySelect').value,
+                gender: document.getElementById('genderSelect').value,
+                ageRange: document.getElementById('ageRangeSelect').value,
+                device: document.getElementById('deviceSelect').value,
+                hairStyle: document.getElementById('hairStyleSelect').value,
+                accessories: document.getElementById('accessoriesSelect').value,
+                apparelType: document.getElementById('apparelTypeSelect').value,
+                apparelColor: document.getElementById('apparelColorSelect').value,
+                actionAndContext: document.getElementById('actionInput').value.trim() || "Reviewing official corporate documents",
+                environment: document.getElementById('environmentSelect').value,
+                lighting: document.getElementById('lightingSelect').value,
+                cameraSpecs: document.getElementById('cameraSelect').value,
+                customNotes: document.getElementById('customNotes') ? document.getElementById('customNotes').value.trim() : ""
+            };
+
+            const apiKey = localStorage.getItem('gemini_api_key') || "";
+
+            // Update UI & Status State to Generating
+            updateStatusState('generating');
+            generateBtn.disabled = true;
+            generateBtn.classList.add('opacity-75');
+            placeholder.classList.add('hidden');
+            resultText.classList.add('hidden');
+            loadingState.classList.remove('hidden');
+            loadingState.classList.add('flex');
+
+            const systemPrompt = `You are an elite AI Prompt Engineer specializing in hyper-realistic corporate, institutional, and legal photography prompts for Flux.1, Midjourney v6.1, Google Imagen 3, and DALL-E 3.
+
+YOUR TASK:
+Synthesize the provided parameters into a single, cohesive, highly descriptive, photorealistic image prompt written ENTIRELY IN ENGLISH.
+
+CRITICAL RULES FOR v3.0.12:
+1. ACCURATE DEMOGRAPHICS & LOCATION CUES: Seamlessly combine nationality/ethnicity traits, age group, and gender into realistic natural photographic cues without cliché stereotypes.
+2. STYLING & APPAREL PRECISION: Describe Hair Style, Accessories, Apparel Type, and Color Palette with realistic material textures.
+3. PROFESSION-ENVIRONMENT SYNERGY: Integrate the environment settings tailored to the selected profession naturally in the background scene.
+4. DEVICE & POSE: Naturally position the specified device or props into the subject's posture.
+5. ENGINE TAILORING:
+   - If Target Engine is Midjourney: Append appropriate parameters at the end (e.g. --ar 16:9 --v 6.1 --style raw).
+   - If Target Engine is Flux / Imagen 3: Use detailed, fluid natural language without artificial quality keywords.
+6. ADDITIONAL AESTHETICS: Incorporate any custom aesthetic notes seamlessly.
+7. OUTPUT FORMAT: Respond ONLY with the final prompt text in English. No introductory text or quotation marks.`;
+
+            const userQuery = `Target AI Engine: ${formData.targetEngine}
+Aspect Ratio: ${formData.aspectRatio}
+
+[DEMOGRAPHIC & PROFILE]
+- Profession: ${formData.profession}
+- Nationality / Location Context: ${formData.nationality}
+- Gender Identity: ${formData.gender}
+- Age Range: ${formData.ageRange}
+
+[STYLE, APPAREL & PROPS]
+- Hair Style: ${formData.hairStyle}
+- Accessories: ${formData.accessories}
+- Apparel Type: ${formData.apparelType}
+- Apparel Color Palette: ${formData.apparelColor}
+- Device / Props Used: ${formData.device}
+
+[SCENE & ENVIRONMENT]
+- Raw Action / Context (Spanish Input): ${formData.actionAndContext}
+- Office Environment: ${formData.environment}
+- Lighting & Mood: ${formData.lighting}
+- Camera & Lens: ${formData.cameraSpecs}
+- Additional Aesthetic Instructions: ${formData.customNotes || "None"}`;
+
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            try {
+                const response = await fetchWithRetry(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                const outputText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (outputText) {
+                    currentGeneratedPrompt = outputText.trim();
+                    resultText.innerText = currentGeneratedPrompt;
+                    loadingState.classList.add('hidden');
+                    loadingState.classList.remove('flex');
+                    resultText.classList.remove('hidden');
+                    testImageBtn.disabled = false;
+                    updateStatusState('generated');
+                    showToast("¡Prompt v3.0.12 generado exitosamente en inglés!", "success");
+                } else {
+                    throw new Error("No se obtuvo texto en la respuesta de Gemini.");
+                }
+
+            } catch (err) {
+                console.error("Gemini API Error:", err);
+                loadingState.classList.add('hidden');
+                loadingState.classList.remove('flex');
+                placeholder.classList.remove('hidden');
+                placeholder.innerHTML = `<span class="text-rose-400"><i class="fa-solid fa-circle-exclamation mr-1"></i> Error al llamar a la API de Gemini: ${err.message}. Verifica tu API Key.</span>`;
+                updateStatusState('ready');
+                showToast("Error al generar el prompt", "error");
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.classList.remove('opacity-75');
+            }
+        }
+
+        async function fetchWithRetry(url, options, maxRetries = 3) {
+            let delay = 1000;
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const res = await fetch(url, options);
+                    if (res.ok) return res;
+                    if (res.status === 429 || res.status >= 500) {
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2;
+                    } else {
+                        const errBody = await res.text();
+                        throw new Error(`HTTP ${res.status}: ${errBody}`);
+                    }
+                } catch (e) {
+                    if (i === maxRetries - 1) throw e;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2;
+                }
+            }
+        }
+
+        function copyPromptToClipboard() {
+            if (!currentGeneratedPrompt) return;
+            
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = currentGeneratedPrompt;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            
+            try {
+                document.execCommand('copy');
+                const copyBtnText = document.getElementById('copyBtnText');
+                copyBtnText.innerText = "¡Copiado!";
+                setTimeout(() => { copyBtnText.innerText = "Copiar"; }, 2000);
+                showToast("Prompt copiado al portapapeles", "success");
+            } catch (err) {
+                showToast("Error al copiar texto", "error");
+            } finally {
+                document.body.removeChild(tempTextArea);
+            }
+        }
+
+        async function testGenerateImage() {
+            if (!currentGeneratedPrompt) return;
+
+            const apiKey = localStorage.getItem('gemini_api_key') || "";
+            const imageCard = document.getElementById('testImageCard');
+            const imageLoader = document.getElementById('imageLoader');
+            const previewImg = document.getElementById('previewImg');
+
+            imageCard.classList.remove('hidden');
+            imageLoader.classList.remove('hidden');
+            imageLoader.classList.add('flex');
+            previewImg.classList.add('hidden');
+
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-image:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{
+                    parts: [{ text: currentGeneratedPrompt }]
+                }],
+                generationConfig: {
+                    responseModalities: ['TEXT', 'IMAGE']
+                }
+            };
+
+            try {
+                const response = await fetchWithRetry(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const base64Data = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+
+                if (base64Data) {
+                    previewImg.src = `data:image/png;base64,${base64Data}`;
+                    imageLoader.classList.add('hidden');
+                    imageLoader.classList.remove('flex');
+                    previewImg.classList.remove('hidden');
+                    showToast("Imagen de prueba generada con éxito", "success");
+                } else {
+                    throw new Error("Respuesta de imagen vacía o no soportada.");
+                }
+
+            } catch (err) {
+                console.error("Image Generation Error:", err);
+                imageLoader.classList.add('hidden');
+                imageLoader.classList.remove('flex');
+                showToast("No se pudo generar la imagen de prueba: " + err.message, "error");
+            }
+        }
+
+        function closeImagePreview() {
+            document.getElementById('testImageCard').classList.add('hidden');
+        }
+
+        function showToast(msg, type = "info") {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMessage.innerText = msg;
+            if (type === 'success') {
+                toastIcon.className = "fa-solid fa-circle-check text-emerald-400";
+            } else if (type === 'error') {
+                toastIcon.className = "fa-solid fa-circle-xmark text-rose-400";
+            } else {
+                toastIcon.className = "fa-solid fa-info-circle text-blue-400";
+            }
+
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
